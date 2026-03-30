@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useIsOfficer } from "@/lib/role-context";
+import { useIsOfficer } from "@/lib/auth-context";
 
 const RESOURCES = [
   { title: "Drill Manual — Basic Movements", cat: "drill", size: "2.4 MB", date: "10 Jan 2026", wing: "all" },
@@ -24,8 +24,17 @@ export default function StudyPage() {
   const isOfficer = useIsOfficer();
   const [filter, setFilter] = useState("all");
   const [modalOpen, setModalOpen] = useState(false);
+  const [downloading, setDownloading] = useState<string | null>(null);
   const [toast, setToast] = useState("");
   const showToast = (m: string) => { setToast(m); setTimeout(() => setToast(""), 2500); };
+
+  const startDownload = (title: string) => {
+    setDownloading(title);
+    setTimeout(() => {
+      setDownloading(null);
+      showToast(`Downloaded: ${title}`);
+    }, 1500);
+  };
 
   // Officers see all resources, cadets only see their allotted subjects
   const availableResources = isOfficer
@@ -79,15 +88,29 @@ export default function StudyPage() {
 
       <div className="db-grid-3">
         {filtered.map((r, i) => (
-          <div className="db-resource-card" key={i}>
-            <div className="db-resource-icon">
-              <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="3" y="2" width="12" height="14" rx="1" stroke="currentColor" strokeWidth="1.2" /><path d="M6 6h6M6 9h4" stroke="currentColor" strokeWidth="1" /></svg>
+          <div className="db-resource-card" key={i} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+              <div className="db-resource-icon">
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="3" y="2" width="12" height="14" rx="1" stroke="currentColor" strokeWidth="1.2" /><path d="M6 6h6M6 9h4" stroke="currentColor" strokeWidth="1" /></svg>
+              </div>
+              <div style={{ flex: 1 }}>
+                <div className="db-resource-title">{r.title}</div>
+                <div className="db-resource-meta" style={{ marginTop: 8 }}>
+                  <span className="db-badge db-badge-gray">{catLabel(r.cat)}</span>
+                  <span className="db-resource-size">{r.size}</span>
+                  <span className="db-resource-size">{r.date}</span>
+                </div>
+              </div>
             </div>
-            <div className="db-resource-title">{r.title}</div>
-            <div className="db-resource-meta">
-              <span className="db-badge db-badge-gray">{catLabel(r.cat)}</span>
-              <span className="db-resource-size">{r.size}</span>
-              <span className="db-resource-size">{r.date}</span>
+            <div style={{ marginTop: "auto" }}>
+              <button 
+                className="db-btn db-btn-ghost" 
+                style={{ width: "100%", justifyContent: "center" }}
+                onClick={() => startDownload(r.title)}
+                disabled={downloading === r.title}
+              >
+                {downloading === r.title ? "Downloading..." : "Download"}
+              </button>
             </div>
           </div>
         ))}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useIsOfficer } from "@/lib/role-context";
+import { useIsOfficer } from "@/lib/auth-context";
 
 type Notif = { title: string; time: string; read: boolean; audience: "officer" | "cadet" | "all" };
 

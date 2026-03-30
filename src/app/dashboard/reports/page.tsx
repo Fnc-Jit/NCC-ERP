@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useIsOfficer } from "@/lib/role-context";
+import { useIsOfficer } from "@/lib/auth-context";
 
 export default function ReportsPage() {
   const isOfficer = useIsOfficer();
@@ -9,8 +9,17 @@ export default function ReportsPage() {
 }
 
 function OfficerReports() {
+  const [exporting, setExporting] = useState(false);
   const [toast, setToast] = useState("");
   const showToast = (m: string) => { setToast(m); setTimeout(() => setToast(""), 2500); };
+
+  const handleExport = () => {
+    setExporting(true);
+    setTimeout(() => {
+      setExporting(false);
+      showToast("Report exported successfully!");
+    }, 2000);
+  };
 
   return (
     <>
@@ -19,7 +28,18 @@ function OfficerReports() {
           <div className="db-section-title">Attendance <em>Reports</em></div>
           <div className="db-section-sub">PDF export · analytics · eligibility</div>
         </div>
-        <button className="db-btn db-btn-white" onClick={() => showToast("Generating PDF report...")}>Export PDF Report</button>
+        <button 
+          className="db-btn db-btn-white" 
+          onClick={handleExport}
+          disabled={exporting}
+        >
+          {exporting ? (
+            <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <svg className="animate-spin" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+              Generating PDF...
+            </span>
+          ) : "Export PDF Report"}
+        </button>
       </div>
 
       <div className="db-card" style={{ marginBottom: 16 }}>
@@ -86,6 +106,18 @@ function OfficerReports() {
 }
 
 function CadetReports() {
+  const [exporting, setExporting] = useState(false);
+  const [toast, setToast] = useState("");
+  const showToast = (m: string) => { setToast(m); setTimeout(() => setToast(""), 2500); };
+
+  const handleExport = () => {
+    setExporting(true);
+    setTimeout(() => {
+      setExporting(false);
+      showToast("Report exported successfully!");
+    }, 2000);
+  };
+
   return (
     <>
       <div className="db-section-hdr">
@@ -93,6 +125,18 @@ function CadetReports() {
           <div className="db-section-title">My <em>Report</em></div>
           <div className="db-section-sub">Personal attendance analytics</div>
         </div>
+        <button 
+          className="db-btn db-btn-white" 
+          onClick={handleExport}
+          disabled={exporting}
+        >
+          {exporting ? (
+            <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <svg className="animate-spin" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+              Generating PDF...
+            </span>
+          ) : "Download PDF"}
+        </button>
       </div>
 
       <div className="db-report-summary" style={{ marginBottom: 16 }}>
@@ -141,6 +185,7 @@ function CadetReports() {
           </tbody>
         </table>
       </div>
+      <div className={`db-toast${toast ? " show" : ""}`}>{toast}</div>
     </>
   );
 }

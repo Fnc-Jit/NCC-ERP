@@ -15,6 +15,7 @@ const SUBJECTS = [
 
 export default function SubjectsPage() {
   const [modalOpen, setModalOpen] = useState(false);
+  const [managingSubject, setManagingSubject] = useState<typeof SUBJECTS[0] | null>(null);
   const [toast, setToast] = useState("");
   const showToast = (m: string) => { setToast(m); setTimeout(() => setToast(""), 2500); };
 
@@ -47,7 +48,7 @@ export default function SubjectsPage() {
                 <td><span className="db-badge db-badge-gray">{s.wing}</span></td>
                 <td style={{ fontFamily: "var(--font-ibm-mono), monospace" }}>{s.cadets}</td>
                 <td>
-                  <button className="db-btn db-btn-ghost" style={{ fontSize: 9, padding: "4px 10px" }} onClick={() => showToast(`Managing ${s.name}`)}>Manage Cadets</button>
+                  <button className="db-btn db-btn-ghost" style={{ fontSize: 9, padding: "4px 10px" }} onClick={() => setManagingSubject(s)}>Manage Cadets</button>
                 </td>
               </tr>
             ))}
@@ -71,6 +72,50 @@ export default function SubjectsPage() {
           </div>
         </div>
       </div>
+
+      {/* Manage Cadets Modal */}
+      {managingSubject && (
+        <div className="db-modal-overlay open" onClick={() => setManagingSubject(null)}>
+          <div className="db-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 500 }}>
+            <div className="db-modal-header">
+              <div className="db-modal-title">Manage Cadets</div>
+              <button className="db-modal-close" onClick={() => setManagingSubject(null)}>×</button>
+            </div>
+            <div className="db-modal-body">
+              <div style={{ marginBottom: 16 }}>
+                <div style={{ fontSize: 13, color: "var(--db-gray4)", marginBottom: 4 }}>Subject</div>
+                <div style={{ fontSize: 15, fontWeight: 500, color: "var(--db-gray1)" }}>{managingSubject.name} <span style={{ fontFamily: "var(--font-ibm-mono), monospace", fontSize: 11, color: "var(--db-gray5)", marginLeft: 8 }}>{managingSubject.code}</span></div>
+              </div>
+              <div className="db-card-label" style={{ marginBottom: 12 }}>Enrollment Strategy</div>
+              <div className="db-form-group">
+                <select className="db-inp">
+                  <option>All Cadets (Auto-enroll)</option>
+                  <option>Specific Companies Only</option>
+                  <option>Specific Wings Only</option>
+                  <option>Manual Enrollment</option>
+                </select>
+              </div>
+              
+              <div className="db-card-label" style={{ marginTop: 24, marginBottom: 12 }}>Assign Specific Companies</div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
+                {["Alpha", "Bravo", "Charlie", "Delta"].map(co => (
+                  <label key={co} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, cursor: "pointer" }}>
+                    <input type="checkbox" defaultChecked={managingSubject.wing === "All"} /> {co}
+                  </label>
+                ))}
+              </div>
+            </div>
+            <div className="db-modal-footer">
+              <button className="db-btn db-btn-ghost" onClick={() => setManagingSubject(null)}>Cancel</button>
+              <button className="db-btn db-btn-white" onClick={() => { 
+                setManagingSubject(null); 
+                showToast("Enrollment settings updated!"); 
+              }}>Save Changes</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className={`db-toast${toast ? " show" : ""}`}>{toast}</div>
     </>
   );

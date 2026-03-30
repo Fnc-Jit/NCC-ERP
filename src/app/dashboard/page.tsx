@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRole, useIsOfficer } from "@/lib/role-context";
+import { useRole, useIsOfficer } from "@/lib/auth-context";
 
 export default function DashboardHomePage() {
   const role = useRole();

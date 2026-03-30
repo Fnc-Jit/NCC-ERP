@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useIsOfficer } from "@/lib/role-context";
+import { useIsOfficer } from "@/lib/auth-context";
 
 const NEWS = [
   { headline: "NCC Directorate Karnataka Announces RDC 2027 Quota", summary: "6 seats allocated to Bengaluru district for Republic Day Camp 2027.", date: "27 Mar 2026", published: true },
@@ -13,6 +13,7 @@ const NEWS = [
 export default function NewsPage() {
   const isOfficer = useIsOfficer();
   const [modalOpen, setModalOpen] = useState(false);
+  const [viewingNews, setViewingNews] = useState<typeof NEWS[0] | null>(null);
   const [toast, setToast] = useState("");
   const showToast = (m: string) => { setToast(m); setTimeout(() => setToast(""), 2500); };
 
@@ -44,7 +45,7 @@ export default function NewsPage() {
               <div className="db-card-title" style={{ fontSize: 15 }}>{n.headline}</div>
               <div className="db-card-desc">{n.summary}</div>
             </div>
-            <button className="db-btn db-btn-ghost" style={{ flexShrink: 0 }} onClick={() => showToast("Opening article...")}>View</button>
+            <button className="db-btn db-btn-ghost" style={{ flexShrink: 0 }} onClick={() => setViewingNews(n)}>View</button>
           </div>
         ))}
       </div>
@@ -66,6 +67,35 @@ export default function NewsPage() {
           </div>
         </div>
       )}
+
+      {/* Article Modal */}
+      {viewingNews && (
+        <div className="db-modal-overlay open" onClick={() => setViewingNews(null)}>
+          <div className="db-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 640 }}>
+            <div className="db-modal-header">
+              <div className="db-modal-title">News Article</div>
+              <button className="db-modal-close" onClick={() => setViewingNews(null)}>×</button>
+            </div>
+            <div className="db-modal-body">
+              <div style={{ display: "flex", gap: 12, alignItems: "center", marginBottom: 16 }}>
+                {isOfficer && (
+                  <span className={`db-badge ${viewingNews.published ? "db-badge-green" : "db-badge-gray"}`}>{viewingNews.published ? "Published" : "Draft"}</span>
+                )}
+                <span style={{ fontFamily: "var(--font-ibm-mono), monospace", fontSize: 10, color: "var(--db-gray5)" }}>{viewingNews.date}</span>
+              </div>
+              <div style={{ fontSize: 24, fontWeight: 600, color: "var(--db-gray1)", marginBottom: 16, lineHeight: 1.3 }}>{viewingNews.headline}</div>
+              <div style={{ fontSize: 14, color: "var(--db-gray2)", fontWeight: 500, marginBottom: 24, borderLeft: "3px solid var(--db-blue)", background: "rgba(59,130,246,0.05)", padding: "12px 16px" }}>{viewingNews.summary}</div>
+              <div style={{ fontSize: 14, color: "var(--db-gray3)", lineHeight: 1.7, whiteSpace: "pre-wrap" }}>
+                {"[Full article text mock]\nOfficial communication regarding recent Directorate updates. All cadet companies are to take note of the new schedules and training camp requirements as detailed in the attached appendix.\n\nCommanding Officers are requested to disseminate this information during the next parade fall-in.\n\nIssued by Directorate Command."}
+              </div>
+            </div>
+            <div className="db-modal-footer">
+              <button className="db-btn db-btn-ghost" onClick={() => setViewingNews(null)}>Close</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className={`db-toast${toast ? " show" : ""}`}>{toast}</div>
     </>
   );

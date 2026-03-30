@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useIsOfficer } from "@/lib/role-context";
+import { useIsOfficer } from "@/lib/auth-context";
 
 const FEEDBACK = [
   { token: "anon-8f3k9a", msg: "The parade ground is getting very crowded during morning drills. We should split into two groups by wing to avoid confusion.", time: "28 Mar 2026 · 07:12", read: false },
@@ -18,6 +18,7 @@ export default function FeedbackPage() {
 
 function OfficerFeedback() {
   const [items, setItems] = useState(FEEDBACK);
+  const [replyingTo, setReplyingTo] = useState<typeof items[0] | null>(null);
   const [toast, setToast] = useState("");
   const showToast = (m: string) => { setToast(m); setTimeout(() => setToast(""), 2500); };
   const markAllRead = () => { setItems((prev) => prev.map((f) => ({ ...f, read: true }))); showToast("All marked as read"); };
@@ -53,13 +54,44 @@ function OfficerFeedback() {
           </div>
           <div className="db-feedback-body">{f.msg}</div>
           <div style={{ display: "flex", gap: 8 }}>
-            <button className="db-btn db-btn-ghost" style={{ fontSize: 9, padding: "4px 10px" }} onClick={() => showToast("Reply sent")}>Reply</button>
+            <button className="db-btn db-btn-ghost" style={{ fontSize: 9, padding: "4px 10px" }} onClick={() => setReplyingTo(f)}>Reply</button>
             <button className="db-btn db-btn-ghost" style={{ fontSize: 9, padding: "4px 10px" }} onClick={() => { setItems((prev) => prev.map((ff, ii) => ii === i ? { ...ff, read: true } : ff)); }}>
               {f.read ? "Read" : "Mark Read"}
             </button>
           </div>
         </div>
       ))}
+
+      {/* Reply Modal */}
+      {replyingTo && (
+        <div className="db-modal-overlay open" onClick={() => setReplyingTo(null)}>
+          <div className="db-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="db-modal-header">
+              <div className="db-modal-title">Reply to Feedback</div>
+              <button className="db-modal-close" onClick={() => setReplyingTo(null)}>×</button>
+            </div>
+            <div className="db-modal-body">
+              <div style={{ background: "rgba(255,255,255,0.03)", padding: 12, borderRadius: 6, marginBottom: 16, borderLeft: "3px solid var(--db-gray4)" }}>
+                <div style={{ fontFamily: "var(--font-ibm-mono), monospace", fontSize: 10, color: "var(--db-gray4)", marginBottom: 6 }}>Original Message ({replyingTo.token})</div>
+                <div style={{ fontSize: 13, color: "var(--db-gray2)", lineHeight: 1.5 }}>{replyingTo.msg}</div>
+              </div>
+              <div className="db-form-group">
+                <label className="db-inp-label">Your Reply</label>
+                <textarea className="db-inp" rows={4} placeholder="Write your response... This will be linked to the anonymous token." />
+              </div>
+            </div>
+            <div className="db-modal-footer">
+              <button className="db-btn db-btn-ghost" onClick={() => setReplyingTo(null)}>Cancel</button>
+              <button className="db-btn db-btn-white" onClick={() => { 
+                setReplyingTo(null); 
+                showToast("Reply sent successfully.");
+                setItems((prev) => prev.map(f => f.token === replyingTo.token ? { ...f, read: true } : f));
+              }}>Send Reply</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className={`db-toast${toast ? " show" : ""}`}>{toast}</div>
     </>
   );

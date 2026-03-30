@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useIsOfficer, useRole } from "@/lib/role-context";
+import { useIsOfficer, useRole } from "@/lib/auth-context";
 
 const MARK_CADETS = [
   { name: "Arjun Kumar Singh", chest: "KT-SW-01", status: null as string | null },
@@ -591,6 +591,10 @@ function CadetAttendance() {
     title: string; time: string; co: string; wing: string;
     total: number; present: number; late: number; absent: number;
   } | null>(null);
+  
+  const [disputeOpen, setDisputeOpen] = useState(false);
+  const [disputeSession, setDisputeSession] = useState("");
+  const [disputeReason, setDisputeReason] = useState("");
 
   const myHistory = [
     { date: "27 MAR", type: "Parade", status: "present", title: "Morning Drill Parade", time: "07:00 – 09:30", co: "Alpha", wing: "Army", total: 52, present: 47, late: 3, absent: 2 },
@@ -610,7 +614,7 @@ function CadetAttendance() {
           <div className="db-section-title">My <em>Attendance</em></div>
           <div className="db-section-sub">Session history · Dispute portal</div>
         </div>
-        <button className="db-btn db-btn-ghost" onClick={() => showToast("Dispute form opening...")}>Raise Dispute</button>
+        <button className="db-btn db-btn-ghost" onClick={() => setDisputeOpen(true)}>Raise Dispute</button>
       </div>
 
       <div className="db-grid-4" style={{ marginBottom: 16 }}>
@@ -750,6 +754,53 @@ function CadetAttendance() {
           </div>
         </div>
       )}
+
+      {/* ── RAISE DISPUTE MODAL ── */}
+      {disputeOpen && (
+        <div className="db-modal-overlay open" onClick={() => setDisputeOpen(false)}>
+          <div className="db-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="db-modal-header">
+              <div className="db-modal-title">Raise Attendance Dispute</div>
+              <button className="db-modal-close" onClick={() => setDisputeOpen(false)}>×</button>
+            </div>
+            <div className="db-modal-body">
+              <div className="db-card" style={{ marginBottom: 16, borderColor: "rgba(245,158,11,.15)", background: "rgba(245,158,11,.04)" }}>
+                <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ marginTop: 2, flexShrink: 0 }}><path d="M8 2a6 6 0 100 12A6 6 0 008 2zM8 5v4M8 10.5v.5" stroke="var(--db-amber)" strokeWidth="1.3" /></svg>
+                  <div style={{ fontSize: 12, color: "var(--db-gray3)", lineHeight: 1.6 }}>
+                    Disputes are reviewed by your <strong style={{ color: "var(--db-gray1)" }}>cadet officers and ANO</strong>. Flagging abuse of this system may lead to disciplinary action.
+                  </div>
+                </div>
+              </div>
+              <div className="db-form-group">
+                <label className="db-inp-label">Select Session</label>
+                <select className="db-inp" value={disputeSession} onChange={(e) => setDisputeSession(e.target.value)}>
+                  <option value="">-- Choose a session --</option>
+                  {myHistory.filter(s => s.status !== "present").map((s, i) => (
+                    <option key={i} value={s.title}>{s.date} - {s.title} ({s.status})</option>
+                  ))}
+                </select>
+              </div>
+              <div className="db-form-group">
+                <label className="db-inp-label">Reason for Dispute</label>
+                <textarea className="db-inp" rows={4} placeholder="Please provide specific details. If you have proof (e.g. medical slip), mention it here and submit via physical copy to your officer." value={disputeReason} onChange={(e) => setDisputeReason(e.target.value)} />
+              </div>
+            </div>
+            <div className="db-modal-footer">
+              <button className="db-btn db-btn-ghost" onClick={() => setDisputeOpen(false)}>Cancel</button>
+              <button className="db-btn db-btn-white" onClick={() => { 
+                if (!disputeSession) { showToast("Please select a session"); return; }
+                if (!disputeReason.trim()) { showToast("Please provide a reason"); return; }
+                setDisputeOpen(false); 
+                setDisputeSession("");
+                setDisputeReason("");
+                showToast("Dispute raised. Awaiting officer review."); 
+              }}>Submit Dispute</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className={`db-toast${toast ? " show" : ""}`}>{toast}</div>
     </>
   );

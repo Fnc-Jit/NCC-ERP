@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useIsOfficer } from "@/lib/role-context";
+import { useIsOfficer } from "@/lib/auth-context";
 
 const EVENTS = [
   { type: "Parade", badge: "db-badge-white", date: "Apr 5", title: "Annual Republic Day Parade", desc: "Full unit parade at College Grounds. Dress: Service uniform. 0700 hrs fall-in." },
@@ -14,6 +14,7 @@ const DAYS_WITH_EVENTS = [5, 12, 13, 14, 15, 16, 17, 18];
 export default function EventsPage() {
   const isOfficer = useIsOfficer();
   const [modalOpen, setModalOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<"month" | "list">("month");
   const [toast, setToast] = useState("");
   const showToast = (m: string) => { setToast(m); setTimeout(() => setToast(""), 2500); };
 
@@ -29,65 +30,89 @@ export default function EventsPage() {
           <div className="db-section-sub">March 2026</div>
         </div>
         <div style={{ display: "flex", gap: 8 }}>
-          <button className="db-btn db-btn-ghost">Month</button>
-          <button className="db-btn db-btn-ghost">List</button>
+          <button 
+            className={`db-btn ${viewMode === "month" ? "db-btn-white" : "db-btn-ghost"}`} 
+            onClick={() => setViewMode("month")}
+          >Month</button>
+          <button 
+            className={`db-btn ${viewMode === "list" ? "db-btn-white" : "db-btn-ghost"}`} 
+            onClick={() => setViewMode("list")}
+          >List</button>
           {isOfficer && (
             <button className="db-btn db-btn-white" onClick={() => setModalOpen(true)}>+ Add Event</button>
           )}
         </div>
       </div>
 
-      <div className="db-grid-3-1" style={{ alignItems: "start" }}>
-        {/* Calendar */}
-        <div className="db-card">
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 2 }}>
-            {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
-              <div key={d} style={{ fontFamily: "var(--font-ibm-mono), monospace", fontSize: 9, letterSpacing: ".1em", textTransform: "uppercase" as const, color: "var(--db-gray5)", textAlign: "center", padding: "6px 0" }}>{d}</div>
-            ))}
-            {Array.from({ length: startDay }, (_, i) => (
-              <div key={`e${i}`} />
-            ))}
-            {Array.from({ length: daysInMonth }, (_, i) => {
-              const day = i + 1;
-              const isToday = day === today.getDate();
-              const hasEvent = DAYS_WITH_EVENTS.includes(day);
-              return (
-                <div
-                  key={day}
-                  style={{
-                    aspectRatio: "1", display: "flex", alignItems: "center", justifyContent: "center",
-                    fontSize: 11, color: isToday ? "var(--db-gray1)" : "var(--db-gray4)", cursor: "pointer",
-                    border: isToday ? "1px solid var(--db-gray1)" : "1px solid transparent",
-                    position: "relative",
-                  }}
-                >
-                  {day}
-                  {hasEvent && <span style={{ position: "absolute", bottom: 4, width: 4, height: 4, background: "var(--db-amber)", borderRadius: "50%" }} />}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Events list */}
-        <div>
-          <div className="db-card" style={{ marginBottom: 12 }}>
-            <div className="db-card-label" style={{ marginBottom: 12 }}>Upcoming Events</div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              {EVENTS.map((ev, i) => (
-                <div className="db-feedback-item" key={i}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <span className={`db-badge ${ev.badge}`}>{ev.type}</span>
-                    <span style={{ fontFamily: "var(--font-ibm-mono), monospace", fontSize: 10, color: "var(--db-gray5)" }}>{ev.date}</span>
-                  </div>
-                  <div className="db-card-title" style={{ marginTop: 8 }}>{ev.title}</div>
-                  <div className="db-card-desc">{ev.desc}</div>
-                </div>
+      {viewMode === "month" ? (
+        <div className="db-grid-3-1" style={{ alignItems: "start" }}>
+          {/* Calendar */}
+          <div className="db-card">
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 2 }}>
+              {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
+                <div key={d} style={{ fontFamily: "var(--font-ibm-mono), monospace", fontSize: 9, letterSpacing: ".1em", textTransform: "uppercase" as const, color: "var(--db-gray5)", textAlign: "center", padding: "6px 0" }}>{d}</div>
               ))}
+              {Array.from({ length: startDay }, (_, i) => (
+                <div key={`e${i}`} />
+              ))}
+              {Array.from({ length: daysInMonth }, (_, i) => {
+                const day = i + 1;
+                const isToday = day === today.getDate();
+                const hasEvent = DAYS_WITH_EVENTS.includes(day);
+                return (
+                  <div
+                    key={day}
+                    style={{
+                      aspectRatio: "1", display: "flex", alignItems: "center", justifyContent: "center",
+                      fontSize: 11, color: isToday ? "var(--db-gray1)" : "var(--db-gray4)", cursor: "pointer",
+                      border: isToday ? "1px solid var(--db-gray1)" : "1px solid transparent",
+                      position: "relative",
+                    }}
+                  >
+                    {day}
+                    {hasEvent && <span style={{ position: "absolute", bottom: 4, width: 4, height: 4, background: "var(--db-amber)", borderRadius: "50%" }} />}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Events list */}
+          <div>
+            <div className="db-card" style={{ marginBottom: 12 }}>
+              <div className="db-card-label" style={{ marginBottom: 12 }}>Upcoming Events</div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {EVENTS.map((ev, i) => (
+                  <div className="db-feedback-item" key={i}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <span className={`db-badge ${ev.badge}`}>{ev.type}</span>
+                      <span style={{ fontFamily: "var(--font-ibm-mono), monospace", fontSize: 10, color: "var(--db-gray5)" }}>{ev.date}</span>
+                    </div>
+                    <div className="db-card-title" style={{ marginTop: 8 }}>{ev.title}</div>
+                    <div className="db-card-desc">{ev.desc}</div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      ) : (
+        <div className="db-card">
+          <div className="db-card-label" style={{ marginBottom: 12 }}>All Events</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {EVENTS.map((ev, i) => (
+              <div className="db-feedback-item" key={i}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <span className={`db-badge ${ev.badge}`}>{ev.type}</span>
+                  <span style={{ fontFamily: "var(--font-ibm-mono), monospace", fontSize: 10, color: "var(--db-gray5)" }}>{ev.date}</span>
+                </div>
+                <div className="db-card-title" style={{ marginTop: 8 }}>{ev.title}</div>
+                <div className="db-card-desc">{ev.desc}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Create Event Modal — officer only */}
       {isOfficer && (

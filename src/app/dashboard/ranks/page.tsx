@@ -1,6 +1,7 @@
 "use client";
 
-import { useIsOfficer } from "@/lib/role-context";
+import { useState } from "react";
+import { useIsOfficer } from "@/lib/auth-context";
 
 const RANKS_DATA = [
   { initials: "RS", name: "Rahul Sharma", rank: "SUO", company: "Alpha · Army" },
@@ -19,6 +20,9 @@ const CHAIN = [
 
 export default function RanksPage() {
   const isOfficer = useIsOfficer();
+  const [modalOpen, setModalOpen] = useState(false);
+  const [toast, setToast] = useState("");
+  const showToast = (m: string) => { setToast(m); setTimeout(() => setToast(""), 2500); };
 
   return (
     <>
@@ -27,7 +31,7 @@ export default function RanksPage() {
           <div className="db-section-title">Rank <em>Hierarchy</em></div>
           <div className="db-section-sub">Official unit command structure</div>
         </div>
-        {isOfficer && <button className="db-btn db-btn-ghost">Manage Ranks</button>}
+        {isOfficer && <button className="db-btn db-btn-ghost" onClick={() => setModalOpen(true)}>Manage Ranks</button>}
       </div>
 
       {/* Command Chain */}
@@ -56,6 +60,52 @@ export default function RanksPage() {
           </div>
         ))}
       </div>
+
+      {/* Manage Ranks Modal */}
+      {isOfficer && (
+        <div className={`db-modal-overlay${modalOpen ? " open" : ""}`} onClick={() => setModalOpen(false)}>
+          <div className="db-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="db-modal-header">
+              <div className="db-modal-title">Manage Ranks</div>
+              <button className="db-modal-close" onClick={() => setModalOpen(false)}>×</button>
+            </div>
+            <div className="db-modal-body">
+              <div className="db-form-group">
+                <label className="db-inp-label">Select Cadet</label>
+                <select className="db-inp">
+                  <option>Select Cadet...</option>
+                  <option>Rahul Sharma (001)</option>
+                  <option>Anjali Menon (002)</option>
+                  <option>Priya Nair (003)</option>
+                </select>
+              </div>
+              <div className="db-form-row">
+                <div className="db-form-group">
+                  <label className="db-inp-label">Assign Rank</label>
+                  <select className="db-inp">
+                    <option>SUO (Senior Under Officer)</option>
+                    <option>UO (Under Officer)</option>
+                    <option>CQMS</option>
+                    <option>Sergeant</option>
+                    <option>Corporal</option>
+                    <option>L/Corporal</option>
+                    <option>Cadet</option>
+                  </select>
+                </div>
+                <div className="db-form-group">
+                  <label className="db-inp-label">Effective Date</label>
+                  <input type="date" className="db-inp" />
+                </div>
+              </div>
+            </div>
+            <div className="db-modal-footer">
+              <button className="db-btn db-btn-ghost" onClick={() => setModalOpen(false)}>Cancel</button>
+              <button className="db-btn db-btn-white" onClick={() => { setModalOpen(false); showToast("Rank updated successfully."); }}>Assign Rank</button>
+            </div>
+          </div>
+        </div>
+      )}
+      <div className={`db-toast${toast ? " show" : ""}`}>{toast}</div>
     </>
   );
 }
