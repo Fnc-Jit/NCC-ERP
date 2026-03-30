@@ -1,12 +1,12 @@
 "use client";
 
-import { RoleProvider } from "@/lib/role-context";
+import { AuthProvider } from "@/lib/auth-context";
 import { DashboardShell } from "@/components/dashboard/dashboard-shell";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
-    <RoleProvider>
+    <AuthProvider>
       <DashboardShell>{children}</DashboardShell>
-    </RoleProvider>
+    </AuthProvider>
   );
 }

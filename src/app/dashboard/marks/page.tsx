@@ -20,6 +20,7 @@ function scoreColor(v: number | null) {
 
 export default function MarksPage() {
   const [subject, setSubject] = useState("all");
+  const [editing, setEditing] = useState(false);
   const [toast, setToast] = useState("");
   const showToast = (m: string) => { setToast(m); setTimeout(() => setToast(""), 2500); };
 
@@ -30,7 +31,17 @@ export default function MarksPage() {
           <div className="db-section-title">Marks <em>Management</em></div>
           <div className="db-section-sub">Cadet scores · Subject-wise entry</div>
         </div>
-        <button className="db-btn db-btn-white" onClick={() => showToast("Entering edit mode...")}>Edit Marks</button>
+        <button className="db-btn db-btn-white" onClick={() => {
+          if (editing) {
+            setEditing(false);
+            showToast("Marks saved successfully!");
+          } else {
+            setEditing(true);
+            showToast("Editing mode enabled");
+          }
+        }}>
+          {editing ? "Save Marks" : "Edit Marks"}
+        </button>
       </div>
 
       <div className="db-form-row" style={{ marginBottom: 16 }}>
@@ -71,10 +82,26 @@ export default function MarksPage() {
                 <tr key={i}>
                   <td>{c.name}</td>
                   <td style={{ fontFamily: "var(--font-ibm-mono), monospace", fontSize: 11 }}>{c.chest}</td>
-                  {(subject === "all" || subject === "drill") && <td style={{ fontFamily: "var(--font-ibm-mono), monospace", color: scoreColor(c.drill) }}>{c.drill}</td>}
-                  {(subject === "all" || subject === "weapons") && <td style={{ fontFamily: "var(--font-ibm-mono), monospace", color: scoreColor(c.weapons) }}>{c.weapons ?? "—"}</td>}
-                  {(subject === "all" || subject === "mapReading") && <td style={{ fontFamily: "var(--font-ibm-mono), monospace", color: scoreColor(c.mapReading) }}>{c.mapReading}</td>}
-                  {(subject === "all" || subject === "firstAid") && <td style={{ fontFamily: "var(--font-ibm-mono), monospace", color: scoreColor(c.firstAid) }}>{c.firstAid}</td>}
+                  {(subject === "all" || subject === "drill") && (
+                    <td style={{ fontFamily: "var(--font-ibm-mono), monospace", color: scoreColor(c.drill) }}>
+                      {editing ? <input className="db-inp" type="number" min="0" max="100" defaultValue={c.drill ?? ""} style={{ width: 60, height: 28, padding: "0 8px" }} /> : c.drill}
+                    </td>
+                  )}
+                  {(subject === "all" || subject === "weapons") && (
+                    <td style={{ fontFamily: "var(--font-ibm-mono), monospace", color: scoreColor(c.weapons) }}>
+                      {editing ? <input className="db-inp" type="number" min="0" max="100" defaultValue={c.weapons ?? ""} style={{ width: 60, height: 28, padding: "0 8px" }} /> : (c.weapons ?? "—")}
+                    </td>
+                  )}
+                  {(subject === "all" || subject === "mapReading") && (
+                    <td style={{ fontFamily: "var(--font-ibm-mono), monospace", color: scoreColor(c.mapReading) }}>
+                      {editing ? <input className="db-inp" type="number" min="0" max="100" defaultValue={c.mapReading ?? ""} style={{ width: 60, height: 28, padding: "0 8px" }} /> : c.mapReading}
+                    </td>
+                  )}
+                  {(subject === "all" || subject === "firstAid") && (
+                    <td style={{ fontFamily: "var(--font-ibm-mono), monospace", color: scoreColor(c.firstAid) }}>
+                      {editing ? <input className="db-inp" type="number" min="0" max="100" defaultValue={c.firstAid ?? ""} style={{ width: 60, height: 28, padding: "0 8px" }} /> : c.firstAid}
+                    </td>
+                  )}
                   {subject === "all" && <td style={{ fontFamily: "var(--font-ibm-mono), monospace", fontWeight: 600, color: scoreColor(avg) }}>{avg ?? "—"}</td>}
                 </tr>
               );

@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useMemo, useState } from "react";
-import { navSections, pageTitle, appRoles, type AppRole } from "@/lib/dashboard";
-import { useRole, useSetRole } from "@/lib/role-context";
+import { navSections, pageTitle } from "@/lib/dashboard";
+import { useAuth } from "@/lib/auth-context";
 
 function NavIcon({ name }: { name: string }) {
   const icons: Record<string, React.ReactNode> = {
@@ -30,9 +30,8 @@ function NavIcon({ name }: { name: string }) {
 
 export function DashboardShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const router = useRouter();
-  const role = useRole();
-  const setRole = useSetRole();
+  const { user, role, loading, logout } = useAuth();
+
   const filteredSections = useMemo(
     () =>
       navSections
@@ -42,7 +41,22 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   );
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [roleSwitcherOpen, setRoleSwitcherOpen] = useState(false);
+
+  // Show loading state while auth is verifying
+  if (loading) {
+    return (
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "100vh", background: "var(--db-bg)", color: "var(--db-gray3)", fontFamily: "var(--font-ibm-mono), monospace", fontSize: 13, letterSpacing: ".1em" }}>
+        <div>
+          <svg className="animate-spin" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ display: "block", margin: "0 auto 16px" }}><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+          AUTHENTICATING...
+        </div>
+      </div>
+    );
+  }
+
+  // Derive display name from profile
+  const displayName = user?.full_name || "User";
+  const initials = displayName.split(" ").map((n: string) => n[0]).join("").slice(0, 2).toUpperCase();
 
   return (
     <div className="db-shell">
@@ -76,16 +90,16 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         </nav>
 
         <div className="db-sidebar-footer">
-          <div className="db-avatar">JR</div>
+          <div className="db-avatar">{initials}</div>
           <div className="db-avatar-info">
-            <div className="db-avatar-name">Jitraj R.</div>
+            <div className="db-avatar-name">{displayName}</div>
             <div className="db-avatar-role">{role.toUpperCase()}</div>
           </div>
           <button
             className="db-collapse-btn"
             style={{ marginLeft: "auto" }}
             title="Sign Out"
-            onClick={() => { localStorage.removeItem("ncc-role"); router.push("/login"); }}
+            onClick={logout}
           >
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M5 1H3a1 1 0 00-1 1v10a1 1 0 001 1h2M9 10l3-3-3-3M5 7h7" stroke="currentColor" strokeWidth="1.2"/></svg>
           </button>
@@ -109,39 +123,9 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
             <Link href="/dashboard/settings" className="db-hdr-btn">
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="2" stroke="currentColor" strokeWidth="1.2"/><path d="M7 1v1M7 12v1M1 7h1M12 7h1" stroke="currentColor" strokeWidth="1.2"/></svg>
             </Link>
-            {/* Role Switcher */}
-            <div style={{ position: "relative" }}>
-              <button
-                className="db-role-tag"
-                style={{ cursor: "pointer", background: "none" }}
-                onClick={() => setRoleSwitcherOpen(!roleSwitcherOpen)}
-              >
-                {role === "captain" ? "Captain" : role.toUpperCase()} View ▾
-              </button>
-              {roleSwitcherOpen && (
-                <div style={{
-                  position: "absolute", top: "calc(100% + 6px)", right: 0, minWidth: 160,
-                  background: "var(--db-bg2)", border: "1px solid var(--db-border2)",
-                  zIndex: 300,
-                }}>
-                  {appRoles.map((r) => (
-                    <button
-                      key={r.value}
-                      style={{
-                        display: "block", width: "100%", textAlign: "left", padding: "10px 14px",
-                        fontFamily: "var(--font-ibm-mono), monospace", fontSize: 11, letterSpacing: ".08em",
-                        textTransform: "uppercase" as const, cursor: "pointer",
-                        background: role === r.value ? "rgba(255,255,255,0.06)" : "transparent",
-                        color: role === r.value ? "var(--db-gray1)" : "var(--db-gray4)",
-                        border: "none", borderBottom: "1px solid var(--db-border)",
-                      }}
-                      onClick={() => { setRole(r.value); setRoleSwitcherOpen(false); }}
-                    >
-                      {r.label} {role === r.value && "✓"}
-                    </button>
-                  ))}
-                </div>
-              )}
+            {/* Role Display */}
+            <div className="db-role-tag" style={{ cursor: "default" }}>
+              {role === "captain" ? "Captain" : role.toUpperCase()} View
             </div>
           </div>
         </header>

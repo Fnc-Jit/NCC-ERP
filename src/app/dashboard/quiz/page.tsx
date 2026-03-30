@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useIsOfficer } from "@/lib/role-context";
+import { useIsOfficer } from "@/lib/auth-context";
 
 /* ═══════════════════════ QUIZ DATA ═══════════════════════ */
 
@@ -93,6 +93,10 @@ export default function QuizPage() {
 /* ═══════════════════════ QUIZ PANEL (tile grid) ═══════════════════════ */
 
 function QuizPanel({ quizzes, onAttempt, isOfficer }: { quizzes: Quiz[]; onAttempt: (q: Quiz) => void; isOfficer: boolean }) {
+  const [modalOpen, setModalOpen] = useState(false);
+  const [toast, setToast] = useState("");
+  const showToast = (m: string) => { setToast(m); setTimeout(() => setToast(""), 2500); };
+
   return (
     <>
       <div className="db-section-hdr">
@@ -102,7 +106,7 @@ function QuizPanel({ quizzes, onAttempt, isOfficer }: { quizzes: Quiz[]; onAttem
             {isOfficer ? `${quizzes.length} quizzes · All subjects` : `${quizzes.length} quizzes · Your enrolled subjects`}
           </div>
         </div>
-        {isOfficer && <button className="db-btn db-btn-white">+ Create Quiz</button>}
+        {isOfficer && <button className="db-btn db-btn-white" onClick={() => setModalOpen(true)}>+ Create Quiz</button>}
       </div>
 
       {!isOfficer && (
@@ -147,6 +151,60 @@ function QuizPanel({ quizzes, onAttempt, isOfficer }: { quizzes: Quiz[]; onAttem
           </div>
         ))}
       </div>
+
+      {/* Create Quiz Modal */}
+      {isOfficer && (
+        <div className={`db-modal-overlay${modalOpen ? " open" : ""}`} onClick={() => setModalOpen(false)}>
+          <div className="db-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="db-modal-header">
+              <div className="db-modal-title">Create Quiz</div>
+              <button className="db-modal-close" onClick={() => setModalOpen(false)}>×</button>
+            </div>
+            <div className="db-modal-body">
+              <div className="db-form-group">
+                <label className="db-inp-label">Quiz Title</label>
+                <input className="db-inp" placeholder="e.g. Map Reading - Advanced" />
+              </div>
+              <div className="db-form-row">
+                <div className="db-form-group">
+                  <label className="db-inp-label">Subject</label>
+                  <select className="db-inp">
+                    <option>Drill</option>
+                    <option>Weapons</option>
+                    <option>Map Reading</option>
+                    <option>Field Craft</option>
+                    <option>First Aid</option>
+                    <option>General</option>
+                  </select>
+                </div>
+                <div className="db-form-group">
+                  <label className="db-inp-label">Difficulty</label>
+                  <select className="db-inp">
+                    <option>Easy</option>
+                    <option>Medium</option>
+                    <option>Hard</option>
+                  </select>
+                </div>
+              </div>
+              <div className="db-form-row">
+                <div className="db-form-group">
+                  <label className="db-inp-label">Duration (minutes)</label>
+                  <input type="number" className="db-inp" defaultValue={15} />
+                </div>
+                <div className="db-form-group">
+                  <label className="db-inp-label">Number of Questions</label>
+                  <input type="number" className="db-inp" defaultValue={10} />
+                </div>
+              </div>
+            </div>
+            <div className="db-modal-footer">
+              <button className="db-btn db-btn-ghost" onClick={() => setModalOpen(false)}>Cancel</button>
+              <button className="db-btn db-btn-white" onClick={() => { setModalOpen(false); showToast("Quiz created successfully."); }}>Publish Quiz</button>
+            </div>
+          </div>
+        </div>
+      )}
+      <div className={`db-toast${toast ? " show" : ""}`}>{toast}</div>
     </>
   );
 }

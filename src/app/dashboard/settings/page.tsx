@@ -1,10 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 export default function SettingsPage() {
   const [toast, setToast] = useState("");
   const showToast = (m: string) => { setToast(m); setTimeout(() => setToast(""), 2500); };
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      showToast(`Uploading ${file.name}...`);
+      setTimeout(() => {
+        showToast("Photo updated successfully!");
+      }, 1500);
+    }
+  };
 
   return (
     <>
@@ -26,7 +37,8 @@ export default function SettingsPage() {
                 <div style={{ fontSize: 14, fontWeight: 500 }}>Jitraj R.</div>
                 <div style={{ fontFamily: "var(--font-ibm-mono), monospace", fontSize: 10, color: "var(--db-gray4)" }}>ANO · Kristu Jayanti University NCC</div>
               </div>
-              <button className="db-btn db-btn-ghost" style={{ marginLeft: "auto" }} onClick={() => showToast("Upload triggered")}>Change Photo</button>
+              <button className="db-btn db-btn-ghost" style={{ marginLeft: "auto" }} onClick={() => fileInputRef.current?.click()}>Change Photo</button>
+              <input type="file" ref={fileInputRef} style={{ display: "none" }} accept="image/*" onChange={handlePhotoUpload} />
             </div>
             <div className="db-form-group"><label className="db-inp-label">Full Name</label><input className="db-inp" defaultValue="Jitraj R." /></div>
             <div className="db-form-group"><label className="db-inp-label">Email</label><input className="db-inp" defaultValue="jitraj@kjc.edu.in" readOnly style={{ opacity: 0.5 }} /></div>
