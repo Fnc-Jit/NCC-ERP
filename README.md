@@ -1,5 +1,4 @@
 # 🎛️ NCC Digital Command & Management Platform (NCC-ERP)
-### And God's Eye Network Intrusion Detection Engine (L1)
 
 [![Version](https://img.shields.io/badge/Version-1.0.0--confidential-blue?style=flat-square)](#)
 [![Next.js](https://img.shields.io/badge/Next.js-14.x--16.x-black?logo=nextdotjs&style=flat-square)](#)
@@ -9,25 +8,17 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-4169E1?logo=postgresql&style=flat-square)](#)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4-38B2AC?logo=tailwindcss&style=flat-square)](#)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript&style=flat-square)](#)
-[![XGBoost](https://img.shields.io/badge/XGBoost-ML_Supervised-orange?style=flat-square)](#)
-[![Python](https://img.shields.io/badge/Python-3.x-3776AB?logo=python&style=flat-square)](#)
 [![RLS Security](https://img.shields.io/badge/Supabase_RLS-Enforced-success?style=flat-square)](#)
 [![Compliance](https://img.shields.io/badge/DPDP_Act-Compliant-blue?style=flat-square)](#)
 [![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](#)
 
 ---
 
-## 📖 Workspace Portfolio Overview
+## 📖 Project Overview
 
-This repository contains a unified, multi-module enterprise workspace addressing two critical domains:
-1. **NCC Digital Command & Management Platform (NCC-ERP)**: A full-stack web (React/Next.js) and Android (Flutter) application that digitizes, automates, and streamlines the operations, academic curriculum, rank hierarchy, and attendance systems of a university NCC (National Cadet Corps) unit.
-2. **God's Eye L1 Network Security Engine**: An advanced, AI-powered network threat intrusion detection system driven by an XGBoost supervised pipeline, capable of scanning live SIEM traffic, performing vectorized feature math, computing dynamic trust scores, and triggering automated SOAR playbooks.
+The **NCC Digital Command & Management Platform (NCC-ERP)** is a unified, full-stack web (React/Next.js) and mobile (Android/Flutter) application designed to digitize, automate, and streamline all administrative, academic, and operational activities of a university National Cadet Corps (NCC) unit.
 
----
-
-## 🏢 Module 1: NCC Digital Command & Management Platform
-
-The **NCC Digital Command & Management Platform** replaces fragmented, manual, and unreliable communication channels (such as paper registers, verbal announcements, and chaotic WhatsApp groups) with a single, secure, role-aware, and real-time digital ecosystem.
+It replaces fragmented, manual, and unreliable communication channels (such as paper registers, physical logbooks, and chaotic WhatsApp groups) with a single, secure, role-aware, and real-time digital ecosystem.
 
 ### 🎯 Key Performance Indicators (KPIs)
 ```mermaid
@@ -91,6 +82,7 @@ graph TD
     Edge -->|SMTP Trigger| Resend
 ```
 
+---
 
 ### 🛡️ Core Security Architecture & True Anonymity Flow
 
@@ -164,82 +156,26 @@ Below are screenshots of the fully wired NCC-ERP digital portal interfaces, show
 
 ---
 
-## 👁️ Module 2: God's Eye Layer 1 Network Intrusion Detection Engine
-
-**God's Eye (L1)** is a high-performance network security engine designed to detect intrusion signatures, malicious beaconing, and automated attacks by scanning network flow features. It leverages a supervised **XGBoost Classifier** combined with robust scaling and physical feature engineering to classify network traffic and trigger SOAR playbooks.
-
-### ⚙️ Machine Learning Pipeline
-
-```mermaid
-graph LR
-    Raw["Raw Network Traffic Flow<br>(14 Canonical Features)"]
-    Features["Vectorized Feature Engineering<br>(Interaction Physics Math)"]
-    Scaler["Robust Scaler Transformation<br>(Artifact-aligned)"]
-    XGB["XGBoost Classifier Model<br>(Isotonic calibrated output)"]
-    Threshold{"Optimal Decision Threshold<br>(Training Calibrated)"}
-    SOAR["Automated SOAR Action Trigger<br>(Trust Band Assignment)"]
-
-    Raw --> Features
-    Features --> Scaler
-    Scaler --> XGB
-    XGB --> Threshold
-    Threshold -->|>= Threshold (Attack)| SOAR
-    Threshold -->|< Threshold (Benign)| SOAR
-```
-
-### 🧠 Vectorized Feature Engineering (Interaction Physics)
-
-The engine enhances raw network logs by applying mathematical interaction formulas in real-time, mapping physical characteristics:
-- **Rate-Traffic Asymmetry Interaction**: `conn_rate * traffic_asymmetry`
-- **Flag-Rate Anomaly Interaction**: `tcp_flag_anomaly * conn_rate`
-- **Beaconing-Volume Ratio**: `beaconing_score * bytes_ratio`
-- **Non-Linear Log Scaling**: Computes `log1p` of `conn_rate`, `iat_mean`, and `packet_size_var` to stabilize highly skewed traffic distributions.
-- **Entropy Variance Ratio**: Computes `payload_entropy / max(packet_size_var, 1e-6)` to capture cryptographic payloads in low-variance streams.
-
-### 📊 SOAR Trust Band & Threat Actions
-
-```mermaid
-graph TD
-    classDef trusted fill:#d4edda,stroke:#28a745,stroke-width:2px,color:#155724;
-    classDef low fill:#fff3cd,stroke:#ffc107,stroke-width:2px,color:#856404;
-    classDef medium fill:#ffe8d6,stroke:#fd7e14,stroke-width:2px,color:#d9480f;
-    classDef high fill:#f8d7da,stroke:#dc3545,stroke-width:2px,color:#721c24;
-    classDef critical fill:#e2e3e5,stroke:#343a40,stroke-width:2px,color:#1b1e21;
-
-    Trust["Trust Score = 100 * (1 - Attack_Probability)"]
-    
-    Trust --> T1["Trust >= 85<br>🟢 TRUSTED BAND<br>Action: Normal monitoring"]:::trusted
-    Trust --> T2["Trust 65 - 84<br>🟡 LOW RISK BAND<br>Action: Elevated monitoring"]:::low
-    Trust --> T3["Trust 40 - 64<br>🟠 MEDIUM RISK BAND<br>Action: Alert + Security Review"]:::medium
-    Trust --> T4["Trust 20 - 39<br>🔴 HIGH RISK BAND<br>Action: Isolate host + Investigate"]:::high
-    Trust --> T5["Trust < 20<br>💀 CRITICAL BAND<br>Action: Quarantine IP + Trigger SOAR Playbook"]:::critical
-```
-
----
-
 ## 📁 Repository Structure
 
 ```text
-NCC-ERP/
-├── ncc-web/                      # Next.js 14 Web Portal
-│   ├── src/
-│   │   ├── app/                  # App Router Routes & Layouts
-│   │   │   ├── (auth)/           # Authentication screens
-│   │   │   └── dashboard/        # Officer, Cadet & Admin dashboard pages
-│   │   ├── components/           # Shared shadcn/ui React components
-│   │   ├── hooks/                # Custom React Query & Zustand hooks
-│   │   └── lib/                  # Supabase client & utility helpers
-│   ├── package.json
-│   ├── tsconfig.json
-│   └── tailwind.config.ts
+.
+├── src/
+│   ├── app/                      # App Router Routes & Layouts
+│   │   ├── (auth)/               # Authentication screens (Login, Reset)
+│   │   └── dashboard/            # Officer, Cadet & Admin dashboard pages
+│   ├── components/               # Shared UI elements & shadcn/ui components
+│   ├── hooks/                    # Custom React Query & Zustand state hooks
+│   └── lib/                      # Supabase client instances & helpers
 │
-├── NCC_PRD_v1_0.md               # Product Requirements Document (PRD)
-├── NCC_Frontend_Spec.md          # Frontend Layout & Component Specification
-├── ncc-dashboard.html            # Core Frontend Prototype mockup
-├── FIxxes.md                     # Auditing log & UI event wire mappings
+├── public/                       # Static public assets
+├── asset/                        # Interface screenshots (for documentation)
 │
-├── test_inference.py             # God's Eye L1 inference demonstration script
-├── comprehensive_l1_test.py      # God's Eye attack chain SIEM simulation script
+├── package.json                  # Next.js scripts & dependencies
+├── tsconfig.json                 # TypeScript configuration
+├── next.config.ts                # Next.js configuration settings
+├── postcss.config.mjs            # PostCSS configuration
+├── tailwind.config.ts            # Tailwind CSS configuration
 └── README.md                     # Repository documentation (This file)
 ```
 
@@ -247,20 +183,19 @@ NCC-ERP/
 
 ## 🚀 Quick Start Guide
 
-### 💻 Deploying the NCC-ERP Web Portal
+### 💻 Local Development Setup
 
 #### 1. Prerequisites
-Ensure you have **Node.js 18+** installed.
+Ensure you have **Node.js 18+** installed on your system.
 
 #### 2. Install Dependencies
-Navigate into the web directory and install all required packages:
+Install all required packages from the repository root:
 ```bash
-cd ncc-web
 npm install
 ```
 
 #### 3. Configure Environment Variables
-Create a `.env.local` file in the `ncc-web/` directory:
+Create a `.env.local` file in the root directory:
 ```env
 NEXT_PUBLIC_SUPABASE_URL=https://<your-project-id>.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=<your-supabase-anon-key>
@@ -270,38 +205,13 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=<your-supabase-anon-key>
 ```bash
 npm run dev
 ```
-Open [http://localhost:3000](http://localhost:3000) in your browser.
-
----
-
-### 🛡️ Running God's Eye L1 Security Engine
-
-#### 1. Prerequisites
-Ensure you have Python 3.8+ installed along with the required libraries.
-
-#### 2. Install Dependencies
-```bash
-pip install numpy pandas xgboost joblib scikit-learn
-```
-
-#### 3. Load Model Artifacts
-Before running inference, verify that you have downloaded the required XGBoost pipeline artifacts from the Kaggle training directory into `/kaggle/working/models` (or update the models directory parameter):
-- `L1_xgboost.joblib` (Classifier model)
-- `L1_scaler.joblib` (RobustScaler artifact)
-- `L1_feature_names.joblib` (Feature list)
-- `L1_threshold.json` (Calibrated probability threshold)
-
-#### 4. Run the SIEM Simulation Test
-Run the comprehensive attack chain simulation to see how the engine processes mock traffic:
-```bash
-python comprehensive_l1_test.py
-```
+Open [http://localhost:3000](http://localhost:3000) in your browser to view the application.
 
 ---
 
 ## 🧪 Testing Methodology
 
-The workspace employs a multi-tiered testing strategy ensuring code quality, security compliance, and robust reliability:
+The platform employs a multi-tiered testing strategy ensuring code quality, security compliance, and robust reliability:
 
 1. **Unit Tests (Jest & Flutter Test)**:
    - Covers core business logic including cadet attendance percentage computation, eligibility thresholds, and cryptographic token generation.
